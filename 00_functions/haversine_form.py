@@ -12,8 +12,8 @@ import numpy as np
 
 def haversine_coord(coord1, coord2):
     """
-    Returns the great-circle distance between two points on a sphere given
-    their longitudes and latitudes in miles as a tuple.
+    Returns the great-circle distance in miles between two points on a
+    sphere given their coordinates as a tuple of lists.
 
     >>> haversine_coord([3,5], [4,7])
     154.27478490048566
@@ -37,9 +37,8 @@ def haversine_coord(coord1, coord2):
 
 def haversine_enum(item1, item2):
     """
-    Returns the great-circle distance between two enumearted points
-    on a sphere given their indexes, longitudes, and latitudes in miles
-    as a tuple.
+    Returns the great-circle distance in miles between two enumerated points
+    on a sphere given their indexes, coordinates as a tuple of tuples.
 
     >>> haversine_enum((0, (3,5)), (1, (4,7)))
     154.27478490048566
