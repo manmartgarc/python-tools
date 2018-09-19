@@ -18,9 +18,9 @@ def total_distance(points):
     Returns the length of a path passing throughout all the points
     in a given order
 
-    >>> total_distance([[1,2],[4,6]])
+    >>> total_distance([[1,2], [4,6]])
     5.0
-    >>> total_distance([[3,6],[7,6],[12,6]])
+    >>> total_distance([[3,6], [7,6], [12,6]])
     9.0
     """
     # convert to numpy array
