@@ -14,7 +14,7 @@ import numpy as np
 # %% Main
 
 
-def randomizer(df, cluster_cols, treats, seed=0, idx_col=None):
+def stochatreat(df, cluster_cols, treats, seed=0, idx_col=None):
     """
     Takes a dataframe and an arbitrary number of treatments over an
     arbitrary number of clusters or strata.
@@ -43,7 +43,17 @@ def randomizer(df, cluster_cols, treats, seed=0, idx_col=None):
     The function returns a pandas DataFrame object, which can be merged back
     to the original dataframe.
 
+    Usage
+    -----
+    Single cluster:
+
     >>> treatments = randomizer(df, 'clusters', 2, seed=1337, idx_col='myid')
+    >>> df = df.merge(treatments, left_on='myid', right_index=True)
+
+    Multiple clusters:
+
+    >>> treatments = randomizer(df, ['cluster1', 'cluster2'],
+                                2, seed=1337, idx_col='myid')
     >>> df = df.merge(treatments, left_on='myid', right_index=True)
     """
     np.random.seed(seed)
