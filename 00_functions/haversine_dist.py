@@ -70,6 +70,16 @@ def haversine(coord1, coord2, enum=False):
 
 def total_distance(points):
     """
+    Calculates the sum of haversine distances within an array of
+    coordinates.
+
+    Parameters:
+    ----------
+    points: list or array-like
+        array of coordinate pairs
+
+    Returns
+    -------
     Returns the length of a path passing throughout all the points
     in a given order
 
@@ -78,6 +88,7 @@ def total_distance(points):
     >>> total_distance([[3,6], [7,6], [12,6]])
     9.0
     """
+
     # convert to numpy array
     if type(points) != 'numpy.ndarray':
         points = np.array(points)
