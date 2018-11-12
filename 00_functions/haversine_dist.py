@@ -66,3 +66,27 @@ def haversine(coord1, coord2, enum=False):
         d = r * c
 
         return d
+
+
+def total_distance(points):
+    """
+    Returns the length of a path passing throughout all the points
+    in a given order
+
+    >>> total_distance([[1,2], [4,6]])
+    5.0
+    >>> total_distance([[3,6], [7,6], [12,6]])
+    9.0
+    """
+    # convert to numpy array
+    if type(points) != 'numpy.ndarray':
+        points = np.array(points)
+
+    dists = np.empty(len(points) - 1)
+
+    for i in range(len(points) - 1):
+        dists[i] = haversine(points[i], points[i + 1])
+
+    total = np.sum(dists)
+
+    return total
