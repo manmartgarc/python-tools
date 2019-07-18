@@ -4,79 +4,70 @@
 
 This script defines two formulas used to calculate great-circle distances
 using a haversine formula.
-
-Taken from https://en.wikipedia.org/wiki/Haversine_formula
 """
-
+from typing import List, Union
 import numpy as np
 
 
-def haversine(coord1, coord2, enum=False):
+def haversine(coord0: Union[float, List[float]],
+              coord1: Union[float, List[float]]
+              ) -> np.array:
     """
-    Returns the great-circle distance in miles between two points on a
-    sphere given their coordinates as a pair of tuples or lists.
+    Returns the grea -circle distance in miles between two coordinates,
+    or two pairs of coordinate arrays on a sphere
+    (specified in decimal degrees)
+
+    Taken from https://en.wikipedia.org/wiki/Haversine_formula
 
     Parameters
     ----------
-    coord1: list or tuple
-        First coordinate pair
-    coord2: list or tuple
-        Second coordinate pair
-    enum: boolean
-        Establishes whether coordinates are enumerated or indexed.
+    coord0:     First coordinate pair(s)
+    coord1:     Second coordinate pair(s)
 
     Returns
     -------
-    >>> haversine_coord([3,5], [4,7])
+    >>> haversine([3,5], [4,7])
     154.27478490048566
 
-    >>> haversine_coord((41.325, -72.325), (41.327, -72.327))
+    >>> haversine((41.325, -72.325), (41.327, -72.327))
     0.17282397386672291
     """
-
-    # assert length of coordinates
-    assert len(coord1) + len(coord2) == 4, 'Coordinates exceed object length'
+    # assert length of coordinates pairs to be compared
+    if len(coord0) != len(coord1):
+        raise ValueError('Coordinates must be of same length')
 
     r = 3959  # radius of the earth
 
-    if enum is False:
-        r_lat = np.radians(coord1[0])
-        r_lat2 = np.radians(coord2[0])
-        delta_r_lat = np.radians(coord2[0] - coord1[0])
-        delta_r_lon = np.radians(coord2[1] - coord1[1])
+    coords = np.hstack([np.array(coord0), np.array(coord1)])
+    coords = np.radians(coords)
 
-        a = (np.sin(delta_r_lat / 2) * np.sin(delta_r_lat / 2) +
-             np.cos(r_lat) * np.cos(r_lat2) *
-             np.sin(delta_r_lon / 2) * np.sin(delta_r_lon / 2))
-        c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
-        d = r * c
+    # add dimension if only one dimensional vector
+    if len(coords.shape) == 1:
+        coords = coords.reshape(1, -1)
 
-        return d
+    # difference in phis
+    a = np.square((coords[:, 2] - coords[:, 0]) / 2)
+    # difference in lambdas
+    b = np.square((coords[:, 3] - coords[:, 1]) / 2)
+    # cosines of phis0
+    phicos0 = np.cos(coords[:, 0])
+    # cosine of phis1
+    phicos1 = np.cos(coords[:, 2])
 
-    else:
-        r_lat = np.radians(coord1[1][0])
-        r_lat2 = np.radians(coord2[1][0])
-        delta_r_lat = np.radians(coord2[1][0] - coord1[1][0])
-        delta_r_lon = np.radians(coord2[1][1] - coord1[1][1])
-
-        a = (np.sin(delta_r_lat / 2) * np.sin(delta_r_lat / 2) +
-             np.cos(r_lat) * np.cos(r_lat2) *
-             np.sin(delta_r_lon / 2) * np.sin(delta_r_lon / 2))
-        c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
-        d = r * c
-
-        return d
+    # calculate distance
+    d = 2 * r * np.arcsin(np.sqrt(a + phicos0 * phicos1 * b))
+    # ( ͡° ͜ʖ ͡°)
+    return d
 
 
-def total_distance(points):
+def total_distance(coords: List[float]) -> float:
     """
     Calculates the sum of haversine distances within an array of
     coordinates.
 
     Parameters:
     ----------
-    points: list or array-like
-        array of coordinate pairs
+    points: array of coordinate pairs
 
     Returns
     -------
@@ -88,16 +79,14 @@ def total_distance(points):
     >>> total_distance([[3,6], [7,6], [12,6]])
     9.0
     """
+    # restructure coordinates coordinate array in the following fashion
+    # [[3, 5], [4, 6], [5, 7]] -> [[3, 5, 4, 6], [4, 6, 5, 7], [4, 6, 4, 6]]
+    coords = np.hstack([coords, np.roll(coords, shift=-1, axis=0)])
 
-    # convert to numpy array
-    if type(points) != 'numpy.ndarray':
-        points = np.array(points)
+    # replace last distance calculation to be 0
+    coords[-1, -2:] = coords[-1, :-2]
 
-    dists = np.empty(len(points) - 1)
+    # calculate total distance
+    totald = np.sum(haversine(coords[:, :2], coords[:, 2:]))
 
-    for i in range(len(points) - 1):
-        dists[i] = haversine(points[i], points[i + 1])
-
-    total = np.sum(dists)
-
-    return total
+    return totald
