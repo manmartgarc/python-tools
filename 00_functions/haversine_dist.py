@@ -5,7 +5,6 @@
 This script defines two formulas used to calculate great-circle distances
 using a haversine formula.
 """
-from typing import List, Union
 import numpy as np
 
 
@@ -57,7 +56,7 @@ def haversine(coords: np.array) -> np.array:
     return d
 
 
-def total_distance(coords: List[float]) -> float:
+def total_distance(coords: np.array) -> float:
     """
     Calculates the sum of haversine distances within an array of
     coordinates.
@@ -84,6 +83,6 @@ def total_distance(coords: List[float]) -> float:
     coords[-1, -2:] = coords[-1, :-2]
 
     # calculate total distance
-    totald = np.sum(haversine(coords[:, :2], coords[:, 2:]))
+    totald = np.sum(haversine(coords))
 
     return totald
