@@ -9,11 +9,7 @@ from typing import List, Union
 import numpy as np
 
 
-def haversine(lats0: Union[float, List[float]],
-              lons0: Union[float, List[float]],
-              lats1: Union[float, List[float]],
-              lons1: Union[float, List[float]]
-              ) -> np.array:
+def haversine(coords: np.array) -> np.array:
     """
     Returns the grea -circle distance in miles between two coordinates,
     or two pairs of coordinate arrays on a sphere
@@ -34,13 +30,12 @@ def haversine(lats0: Union[float, List[float]],
     >>> haversine((41.325, -72.325), (41.327, -72.327))
     0.17282397386672291
     """
-    # assert length of coordinates pairs to be compared
-    if len(lats0) != len(lats1):
-        raise ValueError('Coordinates must be of same length')
-
     r = 3959  # radius of the earth
 
-    coords = np.column_stack([lats0, lons0, lats1, lons1])
+    coords = np.array(coords)
+    # assert length of coordinates pairs to be compared
+    if coords.shape[1] != 4:
+        raise ValueError('Coords matrix must only have 4 dimensions')
     coords = np.radians(coords)
 
     # add dimension if only one dimensional vector
